@@ -4,7 +4,7 @@
 
 ## Introduction & Purpose
 
-When data-rich applications rich a certain critical mass, a lot of the design effort is spent on propagating the data through the application.  This is especially the case in graphical applications.  For example, take a financial application.  The core data is probably a list of transactions, containing amounts, dates, and other information.  This data is summarized and displayed in a number of ways.  For example, one widget may display all the transactions to/from a specific account.
+When data-rich applications reahch a certain critical mass, a lot of the design effort is spent on propagating the data through the application.  This is especially the case in graphical applications.  For example, take a financial application.  The core data is probably a list of transactions, containing amounts, dates, and other information.  This data is summarized and displayed in a number of ways.  For example, one widget may display all the transactions to/from a specific account.
 
 If the data is changed in any way, all the widgets depending on it need to be updated.  It can be difficult or time-consuming to create a straightforward data flow from all the dependencies.  DNA is designed for just such a case.
 
@@ -38,4 +38,4 @@ Here the master data-set is broken into smaller chunks.  Each chunk may have mul
 
 ## Inspiration
 
-Inspiration from this project came from biology, Kivy's [properties](http://kivy.org/docs/api-kivy.properties.html), and Blender's [DNA and RNA](http://www.blendernation.com/2008/12/01/blender-dna-rna-and-backward-compatibility/).  Note that, at present, the terms "DNA" and "RNA" have a much different meaning in this project than they do in Blender.
+Inspiration from this project came from biology, Kivy's [properties](http://kivy.org/docs/api-kivy.properties.html), and Blender's [DNA and RNA](http://www.blendernation.com/2008/12/01/blender-dna-rna-and-backward-compatibility/).  Note that, at present, the terms "DNA" and "RNA" have a much different meaning in this project than they do in Blender (and they aren't quite true to biology, either).
