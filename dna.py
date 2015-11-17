@@ -17,8 +17,3 @@ class DNA(object):
         c = DNACrawler(self)
         c.attach_to(self.head)
         return c
-
-
-# simple test/demo
-if __name__ == '__main__':
-    pass

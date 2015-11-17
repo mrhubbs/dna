@@ -41,9 +41,11 @@ Here the master data-set is broken into smaller chunks.  Each chunk may have mul
 ## TODO
 
   * ~~Implement basic DNA chain structure and DNACrawler functionality~~
-  * ~~Implement DNA~~
-  * Implement DNA chain structure and DNACrawler unit tests
+  * ~~Implement core DNA~~
+  * ~~Implement DNA chain structure and DNACrawler unit tests~~
   * Implement interactive visual of DNA chain structure and DNACrawler
+  * Design and implement DNA mechanism for classifying changes to data
+      * Design and implement mechanism for registering RNA
   * Implement RNA
   * Implement RNA unit tests
   * Implement interactive visual of RNA

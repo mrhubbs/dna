@@ -97,10 +97,15 @@ class DNACrawler(object):
         it's originally attached to.
         """
         self.__node = node
+        self.__parent_node_stack.clear()
 
     def reset(self):
         self.__node = self.dna.head
         self.__parent_node_stack.clear()
+
+    @property
+    def current_node(self):
+        return self.__node
 
     def next_node(self):
         """
@@ -121,9 +126,9 @@ class DNACrawler(object):
             self.__node = cur_node.dna_node_next_sib
         else:
             # We may be at the end of the entire chain, or just the local chain.
-            if self.stack:
+            if stack:
                 # At the end of a local chain.
-                cur_parent = self.stack.pop()
+                cur_parent = stack.pop()
                 self.__node = cur_parent.dna_node_next_sib
             else:
                 # Nothing in the stack, at the end of the entire chain.
@@ -246,7 +251,7 @@ class DNACrawler(object):
         specified.
         """
 
-        node = self.__node if basen is None else basen
+        node = self.__node if node is None else node
         if node is None:
             raise DNACrawlerException(
                 "Cannot remove, no node specified and current node is None.")
@@ -254,25 +259,23 @@ class DNACrawler(object):
         prev_n = node.dna_node_prev_sib
         next_n = node.dna_node_next_sib
 
+        node._dna_node_next_sib = None
+        node._dna_node_prev_sib = None
+
         # Does this node have a parent?
         if node.dna_node_parent is not None:
             # There should not be a prev in this case, check if there is a
             # next to link the parent to.
 
-            node.dna_node_parent.__dna_node_child = next_n
+            node.dna_node_parent._dna_node_child = next_n
             if next_n is not None:
-                next_n.__dna_node_parent = node.dna_node_parent
-            node.__dna_node_parent = None
+                next_n._dna_node_parent = node.dna_node_parent
+            node._dna_node_parent = None
 
         # Do we have a previous node?
         if prev_n is not None:
-            prev_n.__dna_node_next_sib = next_n
+            prev_n._dna_node_next_sib = next_n
 
         # Do we have a next node?
         if next_n is not None:
-            next_n.__dna_node_prev_sib = prev_n
-
-
-# simple test/demo
-if __name__ == '__main__':
-    pass
+            next_n._dna_node_prev_sib = prev_n
