@@ -1,10 +1,12 @@
 # DNA
 
-*This is a highly experimental project.  If you're intrigued, try it out or drop me a line.  For now, DNA is being developed in Python.  It may be extended to other languages in the future.*
+*This is a highly experimental project.  The API is subject to extensive change.If you're intrigued, try it out or drop me a line.*
+
+*DNA is being developed in Python.  It may be extended to other languages in the future.*
 
 ## Introduction & Purpose
 
-When data-rich applications reahch a certain critical mass, a lot of the design effort is spent on propagating the data through the application.  This is especially the case in graphical applications.  For example, take a financial application.  The core data is probably a list of transactions, containing amounts, dates, and other information.  This data is summarized and displayed in a number of ways.  For example, one widget may display all the transactions to/from a specific account.
+When data-rich applications reach a certain critical mass, a lot of the design effort is spent on propagating the data through the application.  This is especially the case in graphical applications.  For example, take a financial application.  The core data is probably a list of transactions, containing amounts, dates, and other information.  This data is summarized and displayed in a number of ways.  For example, one widget may display all the transactions to/from a specific account.
 
 If the data is changed in any way, all the widgets depending on it need to be updated.  It can be difficult or time-consuming to create a straightforward data flow from all the dependencies.  DNA is designed for just such a case.
 
@@ -22,7 +24,7 @@ In practice, the design will often be more complicated, as shown below:
 
 Here the master data-set is broken into smaller chunks.  Each chunk may have multiple expressions.  It is also possible to combine DNA and RNA behavior into one object.
 
-## Requirements
+## Possible Requirements
 
   * DNA
     * Support linking to arbitrary number of RNA objects.
@@ -32,9 +34,22 @@ Here the master data-set is broken into smaller chunks.  Each chunk may have mul
   * RNA
     * Whenever possible, draw upon the master data-set instead of duplicating data.
     * Provide a consistent interface for editing the master data-set through the RNA object.
-    
+
   * General
       * DNA and RNA functionality ought to be able to co-exist in one object.
+
+## TODO
+
+  * ~~Implement basic DNA chain structure and DNACrawler functionality~~
+  * Implement DNA
+  * Implement DNA chain structure and DNACrawler unit tests
+  * Implement interactive visual of DNA chain structure and DNACrawler
+  * Implement RNA
+  * Implement RNA unit tests
+  * Implement interactive visual of RNA
+  * Test in several use cases
+  * Stabilize API
+  * Document
 
 ## Inspiration
 
