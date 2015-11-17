@@ -1,6 +1,6 @@
 # DNA
 
-*This is a highly experimental project.  The API is subject to extensive change.If you're intrigued, try it out or drop me a line.*
+*This is a highly experimental project.  The API is subject to extensive change.  If you're intrigued, try it out or drop me a line.*
 
 *DNA is being developed in Python.  It may be extended to other languages in the future.*
 
@@ -41,7 +41,7 @@ Here the master data-set is broken into smaller chunks.  Each chunk may have mul
 ## TODO
 
   * ~~Implement basic DNA chain structure and DNACrawler functionality~~
-  * Implement DNA
+  * ~~Implement DNA~~
   * Implement DNA chain structure and DNACrawler unit tests
   * Implement interactive visual of DNA chain structure and DNACrawler
   * Implement RNA
