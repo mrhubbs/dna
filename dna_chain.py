@@ -129,7 +129,40 @@ class DNACrawler(object):
             # or just the local chain.
             if stack:
                 # At the end of a local chain.
+                # We may simply need to jump back up to the parent to continue,
+                # as in this case:
+                #
+                #    JUMP FROM 3. TO 1.
+                #
+                #          |----<---<---<---<---<-|
+                #          \/                     |
+                #    1. DNANode -- 2. DNANode     |
+                #          |             |        |
+                #          |       3. DNANode ->--|
+                #    4. DNANode
+                #          |
+                #         ...
+                #
+                # ...or we may need to jump back up several parents, as in this
+                # case:
+                #
+                #    JUMP FROM 5. TO 2., AND THEN FINALLY TO 1.
+                #
+                #          |----<---<----|
+                #          |             |-----------|
+                #          \/            \/          |
+                #    1. DNANode -- 2. DNANode        |--<----<--|
+                #          |             |                      |
+                #          |       3. DNANode -- 4. DNANode     |
+                #    6. DNANode                        |        |
+                #          |                     5. DNANode ->--|
+                #         ...
+                #
+                # The loop construct used below can handle any number of jumps
+                # necessary to get back up the chain.
                 cur_parent = stack.pop()
+                while cur_parent.dna_node_next_sib is None and stack:
+                    cur_parent = stack.pop()
                 self.__node = cur_parent.dna_node_next_sib
             else:
                 # Nothing in the stack, at the end of the entire chain.

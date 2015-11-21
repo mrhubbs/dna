@@ -7,7 +7,7 @@ Test the DNA chain structure and DNACrawler functionality.
 
 import unittest
 
-from dna_chain import DNANode, DNACrawler
+from dna_chain import DNANode
 from dna import DNA
 
 
@@ -48,8 +48,10 @@ class tests(test_utils):
         self.n1 = TestNode('node1')
         self.n2 = TestNode('node2')
         self.n3 = TestNode('node3')
+        self.n4 = TestNode('node4')
 
-        self.crawler = DNACrawler(self.dna)
+        self.dna.head = self.n1
+        self.crawler = self.dna.spawn_crawler()
         self.crawler.attach_to(self.n1)
 
     # test inserting (before, after, child)
@@ -177,6 +179,27 @@ class tests(test_utils):
         self.assertIs(self.n1, gen.next())
         self.assertIs(self.n2, gen.next())
         self.assertIs(self.n3, gen.next())
+        self.assertRaises(StopIteration, gen.next)
+
+    def test_14_crawl_w_mul_children(self):
+        """
+        Tests that when traversing this stucture we correctly jump from n3 to
+        n4.
+
+            n1 -- n2 -- n3
+            |
+            n4
+        """
+        c = self.crawler
+        c.insert_child(self.n2, self.n1)
+        c.insert_child(self.n3, self.n2)
+        c.insert_after(self.n4, self.n1)
+
+        gen = c.crawl()
+        self.assertIs(self.n1, gen.next())
+        self.assertIs(self.n2, gen.next())
+        self.assertIs(self.n3, gen.next())
+        self.assertIs(self.n4, gen.next())
         self.assertRaises(StopIteration, gen.next)
 
 
