@@ -125,7 +125,8 @@ class DNACrawler(object):
         elif cur_node.dna_node_next_sib is not None:
             self.__node = cur_node.dna_node_next_sib
         else:
-            # We may be at the end of the entire chain, or just the local chain.
+            # We may be at the end of the entire chain,
+            # or just the local chain.
             if stack:
                 # At the end of a local chain.
                 cur_parent = stack.pop()
@@ -183,6 +184,9 @@ class DNACrawler(object):
         if cur is None:
             raise DNACrawlerException(
                 "Cannot insert, no node specified and current node is None.")
+
+        if cur is self.dna.head:
+            self.dna.head = node
 
         prev_n = cur._dna_node_prev_sib
         parent = cur._dna_node_parent
