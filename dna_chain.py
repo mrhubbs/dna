@@ -194,6 +194,21 @@ class DNACrawler(object):
             yield node
             node = self.next_node()
 
+    def crawl_indents(self):
+        """
+        Same as crawl but returns a tuple.  The first item is the node and the
+        second item is the indentation of the node relative to the previous
+        node returned.
+        """
+
+        stack = self.__parent_node_stack
+        node = self.__node
+        indent = len(stack)
+        while node is not None:
+            yield node, len(stack) - indent
+            indent = len(stack)
+            node = self.next_node()
+
     def crawl_sibs(self):
         """
         Traverse all the siblings coming after
