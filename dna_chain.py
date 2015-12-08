@@ -348,6 +348,10 @@ class DNACrawler(object):
         prev_n = node.dna_node_prev_sib
         next_n = node.dna_node_next_sib
 
+        # Update the DNA head if we are removing it.
+        if node is self.dna.head:
+            self.dna.head = next_n
+
         node._dna_node_next_sib = None
         node._dna_node_prev_sib = None
 
@@ -381,6 +385,11 @@ class DNACrawler(object):
     # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
     # editing "fronted"
     # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+
+    # TODO: if someone accidentally uses add_* when they should use move_*,
+    # that will be bad.  The node will still be connected to other parts of
+    # the DNA chain.  Need to do something about it.  It's currently easy to
+    # make the mistake.
 
     def add_before(self, node=None, ref_node=None):
         node = self.__create_node(node)
