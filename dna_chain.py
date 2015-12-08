@@ -280,6 +280,8 @@ class DNACrawler(object):
             node._dna_node_parent = parent
             parent._dna_node_child = node
 
+        return ref_node
+
     def __insert_after(self, node, ref_node=None):
         """
         Insert node after ref_node.  User current node if ref_node is not
@@ -299,6 +301,8 @@ class DNACrawler(object):
         if next_n is not None:
             next_n._dna_node_prev_sib = node
             node._dna_node_next_sib = next_n
+
+        return ref_node
 
     def __insert_child(self, node, ref_node=None):
         """
@@ -327,6 +331,8 @@ class DNACrawler(object):
             # TODO: this inserts node at the head of the list of children.
             # TODO: we probably want to insert it at the tail.
             self.__insert_before(node, child)
+
+        return ref_node
 
     def __remove(self, node=None):
         """
@@ -378,32 +384,32 @@ class DNACrawler(object):
 
     def add_before(self, node=None, ref_node=None):
         node = self.__create_node(node)
-        self.__insert_before(node, ref_node)
+        ref_node = self.__insert_before(node, ref_node)
         self.emit(('c', '+', node, 'b', ref_node))
 
     def add_after(self, node=None, ref_node=None):
         node = self.__create_node(node)
-        self.__insert_after(node, ref_node)
+        ref_node = self.__insert_after(node, ref_node)
         self.emit(('c', '+', node, 'a', ref_node))
 
     def add_child(self, node=None, ref_node=None):
         node = self.__create_node(node)
-        self.__insert_child(node, ref_node)
+        ref_node = self.__insert_child(node, ref_node)
         self.emit(('c', '+', node, 'c', ref_node))
 
     def move_before(self, node, ref_node=None):
         self.__remove(node)
-        self.__insert_before(node, ref_node)
+        ref_node = self.__insert_before(node, ref_node)
         self.emit(('c', '^', node, 'b', ref_node))
 
     def move_after(self, node, ref_node=None):
         self.__remove(node)
-        self.__insert_after(node, ref_node)
+        ref_node = self.__insert_after(node, ref_node)
         self.emit(('c', '^', node, 'a', ref_node))
 
     def move_child(self, node, ref_node=None):
         self.__remove(node)
-        self.__insert_child(node, ref_node)
+        ref_node = self.__insert_child(node, ref_node)
         self.emit(('c', '^', node, 'c', ref_node))
 
     def remove(self, node=None):
