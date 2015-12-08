@@ -15,6 +15,9 @@ from dna_chain import DNANode
 from dna import DNA
 
 
+DNANode.__repr__ = lambda a: str(a.name)
+
+
 class NodeVis(Label):
     color = ListProperty([0, .6, .5])
     padding = NumericProperty('7dp')
@@ -91,7 +94,7 @@ class DNAVis(Widget):
         try:
             to_run = compile(text, '', 'exec')
             exec(to_run, globals(), self.exec_locals)
-        except (NameError, SyntaxError, AttributeError) as err:
+        except (NameError, SyntaxError, AttributeError, TypeError) as err:
             print(err)
 
         self.redraw()
@@ -132,7 +135,7 @@ if __name__ == '__main__':
 
         n = DNANode()
         n.name = 'NODE 2'
-        c.insert_child(n, dv.dna.head)
+        c.add_child(n, dv.dna.head)
 
         dv.crawler.reset()
         dv.redraw()

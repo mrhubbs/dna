@@ -82,6 +82,12 @@ class DNACrawlerException(Exception):
 class DNACrawler(object):
     """
     An object for traversing, reading, and editing the DNA structure.
+
+    Functionality and terminology:
+
+        "crawls" a DNA chain
+
+        "emits" events when editing the chain
     """
 
     def __init__(self, dna):
@@ -89,7 +95,9 @@ class DNACrawler(object):
         self.__node = None
         self.__parent_node_stack = deque()
 
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
     # traversing/reading
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
 
     def attach_to(self, node):
         """
@@ -220,29 +228,46 @@ class DNACrawler(object):
             yield node
             node = self.next_sib()
 
-    # editing
-
-    def insert_before(self, node, basen=None):
+    def get_origin(self, node):
         """
-        Insert node before basen.  Use the current node if basen is not
+        Starts at the given node and climbs backwards and up the chain as far
+        as possible.
+        """
+        while True:
+            if node.dna_node_prev_sib is not None:
+                node = node.dna_node_prev_sib
+            elif node.dna_node_parent is not None:
+                node = node.dna_node_parent
+            else:
+                break
+
+        return node
+
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+    # editing "backend"
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+
+    def __insert_before(self, node, ref_node=None):
+        """
+        Insert node before ref_node.  Use the current node if ref_node is not
         specified.
         """
 
-        cur = self.__node if basen is None else basen
-        if cur is None:
+        ref_node = self.__node if ref_node is None else ref_node
+        if ref_node is None:
             raise DNACrawlerException(
                 "Cannot insert, no node specified and current node is None.")
 
-        if cur is self.dna.head:
+        if ref_node is self.dna.head:
             self.dna.head = node
 
-        prev_n = cur._dna_node_prev_sib
-        parent = cur._dna_node_parent
+        prev_n = ref_node._dna_node_prev_sib
+        parent = ref_node._dna_node_parent
 
         # handle next/prev
 
-        cur._dna_node_prev_sib = node
-        node._dna_node_next_sib = cur
+        ref_node._dna_node_prev_sib = node
+        node._dna_node_next_sib = ref_node
 
         if prev_n is not None:
             prev_n._dna_node_next_sib = node
@@ -251,53 +276,59 @@ class DNACrawler(object):
         # handle parent/child
 
         if parent is not None:
-            cur._dna_node_parent = None
+            ref_node._dna_node_parent = None
             node._dna_node_parent = parent
             parent._dna_node_child = node
 
-    def insert_after(self, node, basen=None):
+    def __insert_after(self, node, ref_node=None):
         """
-        Insert node after basen.  User current node if basen is not specified.
+        Insert node after ref_node.  User current node if ref_node is not
+        specified.
         """
 
-        cur = self.__node if basen is None else basen
-        if cur is None:
+        ref_node = self.__node if ref_node is None else ref_node
+        if ref_node is None:
             raise DNACrawlerException(
                 "Cannot insert, no node specified and current node is None.")
 
-        next_n = cur.dna_node_next_sib
+        next_n = ref_node.dna_node_next_sib
 
-        cur._dna_node_next_sib = node
-        node._dna_node_prev_sib = cur
+        ref_node._dna_node_next_sib = node
+        node._dna_node_prev_sib = ref_node
 
         if next_n is not None:
             next_n._dna_node_prev_sib = node
             node._dna_node_next_sib = next_n
 
-    def insert_child(self, node, basen=None):
+    def __insert_child(self, node, ref_node=None):
         """
-        Insert node as child of basen.  Use current node if basen is not
+        Insert node as child of ref_node.  Use current node if ref_node is not
         specified.
         """
 
-        cur = self.__node if basen is None else basen
-        if cur is None:
+        ref_node = self.__node if ref_node is None else ref_node
+        if ref_node is None:
             raise DNACrawlerException(
                 "Cannot insert, no node specified and current node is None.")
 
-        child = cur._dna_node_child
+        # If the node we are inserting as a child is the DNA head, then we
+        # need to update the head.
+        if ref_node is self.dna.head:
+            self.dna.head = self.get_origin(ref_node)
+
+        child = ref_node._dna_node_child
 
         if child is None:
             # Easy, there is no child.
-            cur._dna_node_child = node
-            node._dna_node_parent = cur
+            ref_node._dna_node_child = node
+            node._dna_node_parent = ref_node
         else:
             # There is already a child
             # TODO: this inserts node at the head of the list of children.
             # TODO: we probably want to insert it at the tail.
-            self.insert_before(node, child)
+            self.__insert_before(node, child)
 
-    def remove(self, node=None):
+    def __remove(self, node=None):
         """
         Removes node from the chain.  Use current node if node is not
         specified.
@@ -331,3 +362,57 @@ class DNACrawler(object):
         # Do we have a next node?
         if next_n is not None:
             next_n._dna_node_prev_sib = prev_n
+
+    def __create_node(self, node):
+        """
+        Creates a new node if the given node is None.
+        """
+        if node is None:
+            return self.dna.node_factory()
+
+        return node
+
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+    # editing "fronted"
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+
+    def add_before(self, node=None, ref_node=None):
+        node = self.__create_node(node)
+        self.__insert_before(node, ref_node)
+        self.emit(('c', '+', node, 'b', ref_node))
+
+    def add_after(self, node=None, ref_node=None):
+        node = self.__create_node(node)
+        self.__insert_after(node, ref_node)
+        self.emit(('c', '+', node, 'a', ref_node))
+
+    def add_child(self, node=None, ref_node=None):
+        node = self.__create_node(node)
+        self.__insert_child(node, ref_node)
+        self.emit(('c', '+', node, 'c', ref_node))
+
+    def move_before(self, node, ref_node=None):
+        self.__remove(node)
+        self.__insert_before(node, ref_node)
+        self.emit(('c', '^', node, 'b', ref_node))
+
+    def move_after(self, node, ref_node=None):
+        self.__remove(node)
+        self.__insert_after(node, ref_node)
+        self.emit(('c', '^', node, 'a', ref_node))
+
+    def move_child(self, node, ref_node=None):
+        self.__remove(node)
+        self.__insert_child(node, ref_node)
+        self.emit(('c', '^', node, 'c', ref_node))
+
+    def remove(self, node=None):
+        self.__remove(node)
+        self.emit(('c', '-', node))
+
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+    # event emitting
+    # - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ - ~ -
+
+    def emit(self, event):
+        print(event)
